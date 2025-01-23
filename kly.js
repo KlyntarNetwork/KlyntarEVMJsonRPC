@@ -46,9 +46,9 @@ METHODS_MAPPING.set('eth_syncing',_=>false)
 METHODS_MAPPING.set('eth_gasPrice',_=>global.KLY_EVM_OPTIONS.gasPriceInWeiAndHex)
 
 
-METHODS_MAPPING.set('eth_blockNumber',(_,shardID)=>{
+METHODS_MAPPING.set('eth_blockNumber',()=>{
 
-    let latestIndex = BigInt(global.KLY_EVM_METADATA[shardID].nextBlockIndex)-BigInt(1)
+    let latestIndex = BigInt(global.KLY_EVM_METADATA.nextBlockIndex)-BigInt(1)
 
     return Web3.utils.toHex(latestIndex.toString())
 
@@ -190,7 +190,7 @@ METHODS_MAPPING.set('eth_sendTransaction',params=>{
 
 
 //Creates new message call transaction or a contract creation for signed transactions
-METHODS_MAPPING.set('eth_sendRawTransaction',async (params,shardID)=>{
+METHODS_MAPPING.set('eth_sendRawTransaction',async (params)=>{
 
     // The signed transaction data
     let [serializedTransactionInHexWith0x] = params
@@ -205,17 +205,17 @@ METHODS_MAPPING.set('eth_sendRawTransaction',async (params,shardID)=>{
         // It might be an error
         if(result.error) return {error:JSON.stringify(result)}
 
-        // In case we don't the current shard leader - tx should be redirected to the CURRENT shard leader to be included to block immediately
+        // In case we're not the current leader - tx should be redirected to the CURRENT leader to be included to block immediately
 
-        let whoIsShardLeader = await global.getCurrentShardLeaderURL(shardID) // {isMeShardLeader: bool, url(?)}
+        let whoIsCurrentLeader = await global.getCurrentLeaderURL() // {isMeCurrentLeader: bool, url(?)}
 
-        if(whoIsShardLeader.isMeShardLeader){
+        if(whoIsCurrentLeader.isMeCurrentLeader){
 
             global.MEMPOOL.push({type:'EVM_CALL',payload:serializedTransactionInHexWith0x})
 
-        } else if (!whoIsShardLeader.isMeShardLeader && whoIsShardLeader.url){
+        } else if (!whoIsCurrentLeader.isMeCurrentLeader && whoIsCurrentLeader.url){
 
-            const web3 = new Web3(`${whoIsShardLeader.url}/kly_evm_rpc/${shardID}`)
+            const web3 = new Web3(`${whoIsCurrentLeader.url}/kly_evm_rpc`)
 
             // Send to target mempool
 
@@ -282,7 +282,7 @@ METHODS_MAPPING.set('eth_estimateGas',async params=>{
 
 
 
-METHODS_MAPPING.set('eth_getBlockByNumber',async (params,shardID)=>{
+METHODS_MAPPING.set('eth_getBlockByNumber',async (params)=>{
 
     /*
 
@@ -354,13 +354,13 @@ METHODS_MAPPING.set('eth_getBlockByNumber',async (params,shardID)=>{
 
         if(blockNumberInHex === 'latest'){
     
-            let latestIndex = BigInt(global.KLY_EVM_METADATA[shardID].nextBlockIndex)-BigInt(1)
+            let latestIndex = BigInt(global.KLY_EVM_METADATA.nextBlockIndex)-BigInt(1)
             
             blockNumberInHex = Web3.utils.toHex(latestIndex.toString())
     
         }
     
-        let block = await global.STATE.get(`${shardID}:EVM_BLOCK:${blockNumberInHex}`).catch(_=>false)
+        let block = await global.STATE.get(`EVM_BLOCK:${blockNumberInHex}`).catch(_=>false)
     
         return block || {error:'No block with such index'}
     
@@ -370,7 +370,7 @@ METHODS_MAPPING.set('eth_getBlockByNumber',async (params,shardID)=>{
 
 
 
-METHODS_MAPPING.set('eth_getBlockByHash',async (params,shardID) =>{
+METHODS_MAPPING.set('eth_getBlockByHash',async (params) =>{
 
     /*
     
@@ -380,9 +380,9 @@ METHODS_MAPPING.set('eth_getBlockByHash',async (params,shardID) =>{
 
     let [blockHash,fullOrNot] = params
 
-    let blockIndex = await global.STATE.get(`${shardID}:EVM_INDEX:${blockHash}`).catch(_=>false) // get the block index by its hash
+    let blockIndex = await global.STATE.get(`EVM_INDEX:${blockHash}`).catch(_=>false) // get the block index by its hash
    
-    let block = await global.STATE.get(`${shardID}:EVM_BLOCK:${blockIndex}`).catch(_=>false)
+    let block = await global.STATE.get(`EVM_BLOCK:${blockIndex}`).catch(_=>false)
 
     return block || {error:'No block with such hash'}
     
@@ -542,7 +542,7 @@ METHODS_MAPPING.set('eth_getTransactionReceipt',async params=>{
 
 
 //Returns an array of all logs matching a given filter object
-METHODS_MAPPING.set('eth_getLogs',async (params,shardID)=>{
+METHODS_MAPPING.set('eth_getLogs',async (params)=>{
 
 
     /*
@@ -660,7 +660,7 @@ METHODS_MAPPING.set('eth_getLogs',async (params,shardID)=>{
         
         while(fromBlock!==toBlock){
 
-            let blockLogs = await global.STATE.get(`${shardID}:EVM_LOGS:${Web3.utils.toHex(fromBlock.toString())}`).catch(_=>false)
+            let blockLogs = await global.STATE.get(`EVM_LOGS:${Web3.utils.toHex(fromBlock.toString())}`).catch(_=>false)
 
             if(blockLogs){
 

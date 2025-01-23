@@ -61,8 +61,6 @@ export let EVM_ROUTE_HANDLER = async(request,response) => {
 
     let body = request.body
 
-    let shardID = request.params.shardID
-
     let paramsAreOk = body?.params ? Array.isArray(body.params) : true 
 
     if(!body) response.send(ERROR_RETURN(-32700,"Parse error",body.id))
@@ -71,7 +69,7 @@ export let EVM_ROUTE_HANDLER = async(request,response) => {
 
         if(METHODS_MAPPING.has(body.method)){
 
-            let result = await METHODS_MAPPING.get(body.method)(body.params,shardID)
+            let result = await METHODS_MAPPING.get(body.method)(body.params)
 
             if(result.error) response.send(ERROR_RETURN(-32602,"Invalid params => "+result.error,body.id))
 
