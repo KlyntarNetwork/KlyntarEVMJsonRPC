@@ -10,14 +10,14 @@
   "keywords": [],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KLYN74R/KlyntarEVMJsonRPC.git"
+    "url": "git+https://github.com/KlyntarNetwork/KlyntarEVMJsonRPC.git"
   },
   "author": "KlyntarTeam",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/KLYN74R/KlyntarEVMJsonRPC/issues"
+    "url": "https://github.com/KlyntarNetwork/KlyntarEVMJsonRPC/issues"
   },
-  "homepage": "https://github.com/KLYN74R/KlyntarEVMJsonRPC#readme",
+  "homepage": "https://github.com/KlyntarNetwork/KlyntarEVMJsonRPC#readme",
   "dependencies": {
     "@ethereumjs/tx": "^4.0.2",
     "keccak256": "^1.0.6",
