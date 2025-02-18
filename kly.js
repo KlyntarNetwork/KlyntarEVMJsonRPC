@@ -126,15 +126,15 @@ METHODS_MAPPING.set('eth_getCode',async params=>{
 
     let [address,quantityOrTag] = params
 
-    let account = await global.KLY_EVM.getAccount(address).catch(_=>false)
+    let smartContractCodeBuffer = await global.KLY_EVM.getCode(address).catch(_=>null)
 
-    if(account){
+    if(smartContractCodeBuffer){
 
-        let codeHash = '0x'+Buffer.from(account.codeHash).toString('hex')
+        let codeAsHex = '0x'+Buffer.from(smartContractCodeBuffer).toString('hex')
 
-        return codeHash    
+        return codeAsHex    
     
-    }else return {error:'Impossible to get account'}
+    }else return {error:'Impossible to get code'}
 
 
 })
