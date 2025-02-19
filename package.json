@@ -1,6 +1,6 @@
 {
   "name": "@klyntar/klyntarevmjsonrpc",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "description": "A JSON-RPC2.0 implemetation for KLYNTAR to be EVM compatible",
   "main": "klyntarRPC.js",
   "type": "module",
