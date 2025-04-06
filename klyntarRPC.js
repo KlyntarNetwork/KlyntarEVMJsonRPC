@@ -24,7 +24,7 @@ code	message	meaning
 global.METHODS_MAPPING=new Map()
 
 
-let modules = ['web3','net','kly','db','shh']
+let modules = ['web3','net','kly']
 
 for(let mod of modules) await import(`./${mod}.js`)
 
